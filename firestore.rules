@@ -1,0 +1,59 @@
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ─── Helper Functions ──────────────────────────────────────────────────
+    function isAuth() { return request.auth != null; }
+    function uid() { return request.auth.uid; }
+    function isAdmin() {
+      return isAuth() && get(/databases/$(database)/documents/users/$(uid())).data.role == 'admin';
+    }
+    function isPartner() {
+      return isAuth() && get(/databases/$(database)/documents/users/$(uid())).data.role == 'partner';
+    }
+
+    // ─── Users ─────────────────────────────────────────────────────────────
+    match /users/{userId} {
+      // Users can read their own profile; admins can read all
+      allow read: if isAuth() && (uid() == userId || isAdmin());
+      // Users can create their own profile on signup
+      allow create: if isAuth() && uid() == userId;
+      // Users can update their own profile; admins can update any
+      allow update: if isAuth() && (uid() == userId || isAdmin());
+      // Only admins can delete users
+      allow delete: if isAdmin();
+    }
+
+    // ─── Projects ──────────────────────────────────────────────────────────
+    match /projects/{projectId} {
+      // All authenticated users can read projects
+      allow read: if isAuth();
+      // Admins and partners can create projects
+      allow create: if isAuth() && (isAdmin() || isPartner());
+      // Admins and partners can update projects
+      allow update: if isAuth() && (isAdmin() || isPartner());
+      // Only admins can delete projects
+      allow delete: if isAdmin();
+    }
+
+    // ─── Transactions ───────────────────────────────────────────────────────
+    match /transactions/{txId} {
+      // All authenticated users can read transactions
+      allow read: if isAuth();
+      // Any authenticated user can add transactions
+      allow create: if isAuth();
+      // Users can update their own transactions; admins can update any
+      allow update: if isAuth() && (resource.data.addedBy == uid() || isAdmin());
+      // Admins can delete any; others can delete their own
+      allow delete: if isAuth() && (resource.data.addedBy == uid() || isAdmin());
+    }
+
+    // ─── Notifications ──────────────────────────────────────────────────────
+    match /notifications/{notifId} {
+      allow read: if isAuth();
+      allow create: if isAuth();
+      allow update: if isAuth();
+      allow delete: if isAdmin();
+    }
+  }
+}
