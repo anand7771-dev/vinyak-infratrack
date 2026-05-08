@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
-  TextInput as RNTextInput,
+  TextInput as RNTextInput, Alert,
 } from 'react-native';
 import { FAB, Menu, Divider } from 'react-native-paper';
 import { router } from 'expo-router';
@@ -153,6 +153,25 @@ function TxCard({ tx, C, userRole, userId }: { tx: Transaction; C: any; userRole
   const isIncome = tx.type === 'income';
   const canDelete = userRole === 'admin' || tx.addedBy === userId;
 
+  const handleDelete = () => {
+    Alert.alert(
+      'Delete Transaction',
+      'Are you sure you want to delete this entry? This action cannot be undone.',
+      [
+        { text: 'Cancel', style: 'cancel' },
+        {
+          text: 'Delete', style: 'destructive', onPress: async () => {
+            try {
+              await deleteTransaction(tx.id);
+            } catch (e: any) {
+              Alert.alert('Error', e.message);
+            }
+          }
+        }
+      ]
+    );
+  };
+
   return (
     <View style={[styles.txCard, { backgroundColor: C.card }]}>
       <View style={styles.txTop}>
@@ -166,9 +185,16 @@ function TxCard({ tx, C, userRole, userId }: { tx: Transaction; C: any; userRole
           <Text style={[styles.txParty, { color: C.text }]} numberOfLines={1}>{tx.clientOrVendor}</Text>
           <Text style={[styles.txProject, { color: C.textSecondary }]} numberOfLines={1}>{tx.projectName}</Text>
         </View>
-        <Text style={[styles.txAmount, { color: isIncome ? Colors.income : Colors.expense }]}>
-          {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
-        </Text>
+        <View style={{ alignItems: 'flex-end' }}>
+          <Text style={[styles.txAmount, { color: isIncome ? Colors.income : Colors.expense }]}>
+            {isIncome ? '+' : '-'}{formatCurrency(tx.amount)}
+          </Text>
+          {canDelete && (
+            <TouchableOpacity onPress={handleDelete} style={{ marginTop: 8, padding: 4 }}>
+              <MaterialCommunityIcons name="trash-can-outline" size={20} color={Colors.expense} />
+            </TouchableOpacity>
+          )}
+        </View>
       </View>
 
       <View style={styles.txMeta}>

@@ -49,10 +49,10 @@ export default function LoginScreen() {
         {/* Header */}
         <View style={styles.header}>
           <View style={styles.logoBox}>
-            <MaterialCommunityIcons name="hard-hat" size={40} color="#fff" />
+            <Image source={require('../../assets/images/icon.png')} style={{ width: 130, height: 130, resizeMode: 'contain' }} />
           </View>
-          <Text style={styles.companyName}>Vinyak Infratrack</Text>
-          <Text style={styles.tagline}>Road • Bridge • Building</Text>
+          <Text style={styles.companyName}>MS Vinyak Construction</Text>
+          <Text style={styles.tagline}>We Build Today For A Better Tomorrow</Text>
         </View>
 
         {/* Card */}
@@ -139,17 +139,17 @@ const styles = StyleSheet.create({
   scroll: { flexGrow: 1, paddingHorizontal: Spacing.md },
   header: { alignItems: 'center', paddingTop: 60, paddingBottom: 32 },
   logoBox: {
-    width: 80, height: 80, borderRadius: 20,
-    backgroundColor: Colors.primary, alignItems: 'center',
-    justifyContent: 'center', marginBottom: 16,
-    shadowColor: Colors.primary, shadowOffset: { width: 0, height: 8 },
-    shadowOpacity: 0.4, shadowRadius: 16, elevation: 10,
+    width: 150, height: 150, borderRadius: 24,
+    backgroundColor: '#fff', alignItems: 'center',
+    justifyContent: 'center', marginBottom: 12,
+    shadowColor: '#000', shadowOffset: { width: 0, height: 8 },
+    shadowOpacity: 0.25, shadowRadius: 16, elevation: 10,
   },
   companyName: {
-    fontSize: FontSize.xl, fontWeight: '700', color: '#fff',
-    textAlign: 'center', marginBottom: 4,
+    fontSize: FontSize.xl, fontWeight: '800', color: '#fff',
+    textAlign: 'center', marginBottom: 4, letterSpacing: 0.5,
   },
-  tagline: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center' },
+  tagline: { fontSize: FontSize.sm, color: Colors.textMuted, textAlign: 'center', fontStyle: 'italic' },
   card: {
     backgroundColor: '#fff', borderRadius: Radius.lg,
     padding: Spacing.lg, marginBottom: Spacing.lg,
