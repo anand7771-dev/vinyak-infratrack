@@ -4,7 +4,8 @@
 // Your Apps → Web App → Firebase SDK snippet → Config
 
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth } from 'firebase/auth';
+import { initializeAuth, getReactNativePersistence } from 'firebase/auth';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import {
   initializeFirestore,
   CACHE_SIZE_UNLIMITED,
@@ -27,7 +28,9 @@ const firebaseConfig = {
 const app = getApps().length === 0 ? initializeApp(firebaseConfig) : getApp();
 
 // Auth
-export const auth = getAuth(app);
+export const auth = initializeAuth(app, {
+  persistence: getReactNativePersistence(AsyncStorage)
+});
 
 // Firestore with offline persistence
 export const db = initializeFirestore(app, {

@@ -1,4 +1,5 @@
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
+import { View, StyleSheet } from 'react-native';
 import { Stack, router } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { onAuthStateChanged } from 'firebase/auth';
@@ -8,6 +9,7 @@ import { useAppStore } from '../store/appStore';
 import { auth } from '../services/firebase';
 import { fetchUserProfile } from '../services/authService';
 import { Colors } from '../constants/Colors';
+import LockScreen from '../components/LockScreen';
 
 // Custom Paper theme
 const customLightTheme = {
@@ -34,7 +36,8 @@ const customDarkTheme = {
 
 export default function RootLayout() {
   const { setUser, setFirebaseUser, setLoading, clearAuth, isAuthenticated } = useAuthStore();
-  const { isDarkMode } = useAppStore();
+  const { isDarkMode, appLockEnabled } = useAppStore();
+  const [isUnlocked, setIsUnlocked] = useState(false);
   const theme = isDarkMode ? customDarkTheme : customLightTheme;
 
   useEffect(() => {
@@ -61,17 +64,25 @@ export default function RootLayout() {
   return (
     <PaperProvider theme={theme}>
       <StatusBar style={isDarkMode ? 'light' : 'dark'} />
-      <Stack screenOptions={{ headerShown: false }}>
-        <Stack.Screen name="(auth)" />
-        <Stack.Screen name="(tabs)" />
-        <Stack.Screen name="project/[id]" />
-        <Stack.Screen name="project/add" />
-        <Stack.Screen name="income/add" />
-        <Stack.Screen name="expense/add" />
-        <Stack.Screen name="admin/index" />
-        <Stack.Screen name="profile" />
-        <Stack.Screen name="notifications" />
-      </Stack>
+      <View style={{ flex: 1 }}>
+        <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="(auth)" />
+          <Stack.Screen name="(tabs)" />
+          <Stack.Screen name="project/[id]" />
+          <Stack.Screen name="project/add" />
+          <Stack.Screen name="income/add" />
+          <Stack.Screen name="expense/add" />
+          <Stack.Screen name="admin/index" />
+          <Stack.Screen name="profile" />
+          <Stack.Screen name="notifications" />
+        </Stack>
+
+        {isAuthenticated && appLockEnabled && !isUnlocked && (
+          <View style={[StyleSheet.absoluteFill, { zIndex: 9999, elevation: 9999 }]}>
+            <LockScreen onUnlock={() => setIsUnlocked(true)} />
+          </View>
+        )}
+      </View>
     </PaperProvider>
   );
 }

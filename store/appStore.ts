@@ -1,10 +1,16 @@
 import { create } from 'zustand';
+import { persist, createJSONStorage } from 'zustand/middleware';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Project, Transaction, AppNotification } from '../constants/types';
 
 interface AppState {
   // Theme
   isDarkMode: boolean;
   toggleDarkMode: () => void;
+
+  // Security
+  appLockEnabled: boolean;
+  toggleAppLock: () => void;
 
   // Projects
   projects: Project[];
@@ -25,21 +31,36 @@ interface AppState {
   setSelectedProjectId: (id: string | null) => void;
 }
 
-export const useAppStore = create<AppState>((set) => ({
-  isDarkMode: false,
-  toggleDarkMode: () => set((s) => ({ isDarkMode: !s.isDarkMode })),
+export const useAppStore = create<AppState>()(
+  persist(
+    (set) => ({
+      isDarkMode: false,
+      toggleDarkMode: () => set((s) => ({ isDarkMode: !s.isDarkMode })),
 
-  projects: [],
-  setProjects: (projects) => set({ projects }),
+      appLockEnabled: false,
+      toggleAppLock: () => set((s) => ({ appLockEnabled: !s.appLockEnabled })),
 
-  transactions: [],
-  setTransactions: (transactions) => set({ transactions }),
+      projects: [],
+      setProjects: (projects) => set({ projects }),
 
-  notifications: [],
-  setNotifications: (notifications) => set({ notifications }),
-  unreadCount: 0,
-  setUnreadCount: (unreadCount) => set({ unreadCount }),
+      transactions: [],
+      setTransactions: (transactions) => set({ transactions }),
 
-  selectedProjectId: null,
-  setSelectedProjectId: (selectedProjectId) => set({ selectedProjectId }),
-}));
+      notifications: [],
+      setNotifications: (notifications) => set({ notifications }),
+      unreadCount: 0,
+      setUnreadCount: (unreadCount) => set({ unreadCount }),
+
+      selectedProjectId: null,
+      setSelectedProjectId: (selectedProjectId) => set({ selectedProjectId }),
+    }),
+    {
+      name: 'vinyak-app-storage',
+      storage: createJSONStorage(() => AsyncStorage),
+      partialize: (state) => ({ 
+        isDarkMode: state.isDarkMode,
+        appLockEnabled: state.appLockEnabled
+      }),
+    }
+  )
+);
