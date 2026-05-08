@@ -85,6 +85,11 @@ export default function MoreScreen() {
             icon="file-chart-outline" label="Reports & Downloads" C={C}
             onPress={() => router.push('/(tabs)/reports')}
           />
+          <MenuItem
+            icon="folder-multiple-outline" label="Company Files" C={C}
+            iconColor="#7C3AED"
+            onPress={() => router.push('/files')}
+          />
         </View>
 
         <View style={[styles.menuSection, { backgroundColor: C.card }]}>
@@ -138,15 +143,16 @@ export default function MoreScreen() {
   );
 }
 
-function MenuItem({ icon, label, C, onPress, badge }: any) {
+function MenuItem({ icon, label, C, onPress, badge, iconColor }: any) {
+  const color = iconColor ?? Colors.primary;
   return (
     <TouchableOpacity
       style={[styles.menuItem, { borderBottomColor: C.border }]}
       onPress={onPress}
     >
       <View style={styles.menuItemLeft}>
-        <View style={[styles.menuIcon, { backgroundColor: Colors.primary + '15' }]}>
-          <MaterialCommunityIcons name={icon} size={20} color={Colors.primary} />
+        <View style={[styles.menuIcon, { backgroundColor: color + '15' }]}>
+          <MaterialCommunityIcons name={icon} size={20} color={color} />
         </View>
         <Text style={[styles.menuItemLabel, { color: C.text }]}>{label}</Text>
       </View>

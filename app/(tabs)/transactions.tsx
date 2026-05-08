@@ -151,13 +151,12 @@ export default function TransactionsScreen() {
 
 function TxCard({ tx, C, userRole, userId }: { tx: Transaction; C: any; userRole?: string; userId?: string }) {
   const isIncome = tx.type === 'income';
-  // Always show delete — Firestore rules enforce: admin OR addedBy == uid server-side
-  const canDelete = !!userId;
+  const canDelete = userRole === 'admin' || tx.addedBy === userId;
 
   const handleDelete = () => {
     Alert.alert(
       'Delete Transaction',
-      `Delete this ₹${tx.amount.toLocaleString('en-IN')} entry by ${tx.addedByName}?\nThis cannot be undone.`,
+      'Are you sure you want to delete this entry? This action cannot be undone.',
       [
         { text: 'Cancel', style: 'cancel' },
         {
