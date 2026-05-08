@@ -21,7 +21,7 @@ const TYPE_FILTERS: { label: string; value: TransactionType | 'all' }[] = [
 
 export default function TransactionsScreen() {
   const { isDarkMode, transactions, setTransactions, projects } = useAppStore();
-  const { user } = useAuthStore();
+  const { user, firebaseUser } = useAuthStore();
   const [typeFilter, setTypeFilter] = useState<TransactionType | 'all'>('all');
   const [projectFilter, setProjectFilter] = useState<string>('all');
   const [search, setSearch] = useState('');
@@ -117,7 +117,7 @@ export default function TransactionsScreen() {
         keyExtractor={(item) => item.id}
         contentContainerStyle={styles.list}
         showsVerticalScrollIndicator={false}
-        renderItem={({ item }) => <TxCard tx={item} C={C} userRole={user?.role} userId={user?.uid} />}
+        renderItem={({ item }) => <TxCard tx={item} C={C} userRole={user?.role} userId={firebaseUser?.uid} />}
         ListEmptyComponent={
           <View style={styles.empty}>
             <MaterialCommunityIcons name="receipt-text-outline" size={56} color={C.textSecondary} />
@@ -151,12 +151,13 @@ export default function TransactionsScreen() {
 
 function TxCard({ tx, C, userRole, userId }: { tx: Transaction; C: any; userRole?: string; userId?: string }) {
   const isIncome = tx.type === 'income';
-  const canDelete = userRole === 'admin' || tx.addedBy === userId;
+  // Always show delete — Firestore rules enforce: admin OR addedBy == uid server-side
+  const canDelete = !!userId;
 
   const handleDelete = () => {
     Alert.alert(
       'Delete Transaction',
-      'Are you sure you want to delete this entry? This action cannot be undone.',
+      `Delete this ₹${tx.amount.toLocaleString('en-IN')} entry by ${tx.addedByName}?\nThis cannot be undone.`,
       [
         { text: 'Cancel', style: 'cancel' },
         {
