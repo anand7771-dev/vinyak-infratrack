@@ -1,7 +1,8 @@
-import React, { useEffect, useState, useCallback } from 'react';
+import React, { useEffect, useState } from 'react';
 import {
   View, Text, StyleSheet, FlatList, TouchableOpacity,
   Alert, ActivityIndicator, Linking, TextInput as RNTextInput,
+  ScrollView, KeyboardAvoidingView, Platform,
 } from 'react-native';
 import * as DocumentPicker from 'expo-document-picker';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -172,7 +173,11 @@ export default function FilesScreen() {
   // ─── Upload Modal ───────────────────────────────────────────────────────────
   if (showUploadModal) {
     return (
-      <View style={[styles.container, { backgroundColor: C.bg }]}>
+      <KeyboardAvoidingView
+        style={[styles.container, { backgroundColor: C.bg }]}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+      >
+        {/* Header */}
         <View style={[styles.header, { backgroundColor: Colors.bgDark }]}>
           <TouchableOpacity onPress={() => { setShowUploadModal(false); setPickedFile(null); }}>
             <MaterialCommunityIcons name="arrow-left" size={24} color="#fff" />
@@ -181,84 +186,96 @@ export default function FilesScreen() {
           <View style={{ width: 24 }} />
         </View>
 
-        <View style={[styles.uploadModalContent, { backgroundColor: C.card }]}>
-          {/* File Preview */}
-          <View style={[styles.filePreviewBox, { backgroundColor: C.bg }]}>
-            <MaterialCommunityIcons
-              name={getFileIcon(pickedFile?.mimeType ?? '')}
-              size={48}
-              color={getFileIconColor(pickedFile?.mimeType ?? '')}
-            />
-            <Text style={[styles.filePreviewName, { color: C.text }]} numberOfLines={2}>
-              {pickedFile?.name}
-            </Text>
-            <Text style={[styles.filePreviewSize, { color: C.textSecondary }]}>
-              {formatBytes(pickedFile?.size ?? 0)}
-            </Text>
-          </View>
-
-          {/* Category */}
-          <Text style={[styles.label, { color: C.text }]}>Document Category *</Text>
-          <View style={styles.categoryGrid}>
-            {ALL_CATEGORIES.map((cat) => (
-              <TouchableOpacity
-                key={cat}
-                style={[
-                  styles.catChip,
-                  { borderColor: CATEGORY_COLORS[cat] + '60' },
-                  selectedCategory === cat && { backgroundColor: CATEGORY_COLORS[cat], borderColor: CATEGORY_COLORS[cat] },
-                ]}
-                onPress={() => setSelectedCategory(cat)}
-              >
-                <MaterialCommunityIcons
-                  name={DOC_CATEGORY_ICONS[cat] as any}
-                  size={14}
-                  color={selectedCategory === cat ? '#fff' : CATEGORY_COLORS[cat]}
-                />
-                <Text style={[
-                  styles.catChipText,
-                  { color: selectedCategory === cat ? '#fff' : CATEGORY_COLORS[cat] }
-                ]}>
-                  {DOC_CATEGORY_LABELS[cat]}
-                </Text>
-              </TouchableOpacity>
-            ))}
-          </View>
-
-          {/* Notes */}
-          <Text style={[styles.label, { color: C.text }]}>Notes (Optional)</Text>
-          <RNTextInput
-            style={[styles.notesInput, { color: C.text, borderColor: C.border, backgroundColor: C.bg }]}
-            placeholder="e.g. FY 2024-25 audit report..."
-            placeholderTextColor={C.textSecondary}
-            value={docNotes}
-            onChangeText={setDocNotes}
-            multiline
-          />
-
-          {/* Progress */}
-          {uploading && (
-            <View style={styles.progressBox}>
-              <ActivityIndicator color={Colors.primary} />
-              <Text style={[styles.progressText, { color: C.text }]}>
-                Uploading... {Math.round(uploadProgress)}%
+        <ScrollView
+          contentContainerStyle={styles.uploadScrollContent}
+          showsVerticalScrollIndicator={false}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={[styles.uploadModalContent, { backgroundColor: C.card }]}>
+            {/* File Preview */}
+            <View style={[styles.filePreviewBox, { backgroundColor: C.bg }]}>
+              <MaterialCommunityIcons
+                name={getFileIcon(pickedFile?.mimeType ?? '') as any}
+                size={52}
+                color={getFileIconColor(pickedFile?.mimeType ?? '')}
+              />
+              <Text style={[styles.filePreviewName, { color: C.text }]} numberOfLines={2}>
+                {pickedFile?.name}
+              </Text>
+              <Text style={[styles.filePreviewSize, { color: C.textSecondary }]}>
+                {formatBytes(pickedFile?.size ?? 0)}
               </Text>
             </View>
-          )}
 
-          {/* Upload Button */}
-          <TouchableOpacity
-            style={[styles.uploadBtn, uploading && { opacity: 0.6 }]}
-            onPress={handleUpload}
-            disabled={uploading}
-          >
-            <MaterialCommunityIcons name="cloud-upload" size={22} color="#fff" />
-            <Text style={styles.uploadBtnText}>
-              {uploading ? 'Uploading...' : 'Upload Document'}
-            </Text>
-          </TouchableOpacity>
-        </View>
-      </View>
+            {/* Category */}
+            <Text style={[styles.label, { color: C.text }]}>Document Category *</Text>
+            <View style={styles.categoryGrid}>
+              {ALL_CATEGORIES.map((cat) => (
+                <TouchableOpacity
+                  key={cat}
+                  style={[
+                    styles.catChip,
+                    { borderColor: CATEGORY_COLORS[cat] + '60' },
+                    selectedCategory === cat && { backgroundColor: CATEGORY_COLORS[cat], borderColor: CATEGORY_COLORS[cat] },
+                  ]}
+                  onPress={() => setSelectedCategory(cat)}
+                >
+                  <MaterialCommunityIcons
+                    name={DOC_CATEGORY_ICONS[cat] as any}
+                    size={14}
+                    color={selectedCategory === cat ? '#fff' : CATEGORY_COLORS[cat]}
+                  />
+                  <Text style={[
+                    styles.catChipText,
+                    { color: selectedCategory === cat ? '#fff' : CATEGORY_COLORS[cat] }
+                  ]}>
+                    {DOC_CATEGORY_LABELS[cat]}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
+
+            {/* Notes */}
+            <Text style={[styles.label, { color: C.text }]}>Notes (Optional)</Text>
+            <RNTextInput
+              style={[styles.notesInput, { color: C.text, borderColor: C.border, backgroundColor: C.bg }]}
+              placeholder="e.g. FY 2024-25 audit report..."
+              placeholderTextColor={C.textSecondary}
+              value={docNotes}
+              onChangeText={setDocNotes}
+              multiline
+              numberOfLines={3}
+            />
+
+            {/* Progress Bar */}
+            {uploading && (
+              <View style={styles.progressBox}>
+                <ActivityIndicator color={Colors.primary} />
+                <View style={{ flex: 1 }}>
+                  <Text style={[styles.progressText, { color: C.text }]}>
+                    Uploading... {Math.round(uploadProgress)}%
+                  </Text>
+                  <View style={styles.progressTrack}>
+                    <View style={[styles.progressFill, { width: `${uploadProgress}%` as any }]} />
+                  </View>
+                </View>
+              </View>
+            )}
+
+            {/* Upload Button */}
+            <TouchableOpacity
+              style={[styles.uploadBtn, uploading && { opacity: 0.6 }]}
+              onPress={handleUpload}
+              disabled={uploading}
+            >
+              <MaterialCommunityIcons name="cloud-upload" size={22} color="#fff" />
+              <Text style={styles.uploadBtnText}>
+                {uploading ? 'Uploading...' : 'Upload Document'}
+              </Text>
+            </TouchableOpacity>
+          </View>
+        </ScrollView>
+      </KeyboardAvoidingView>
     );
   }
 
@@ -492,8 +509,11 @@ const styles = StyleSheet.create({
   },
   emptyBtnText: { color: '#fff', fontWeight: '700', fontSize: FontSize.md },
   // Upload modal
+  uploadScrollContent: {
+    padding: Spacing.md, paddingBottom: 40,
+  },
   uploadModalContent: {
-    margin: Spacing.md, borderRadius: Radius.lg, padding: Spacing.md,
+    borderRadius: Radius.lg, padding: Spacing.md,
     shadowColor: '#000', shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.08, shadowRadius: 6, elevation: 3, gap: 4,
   },
@@ -519,6 +539,13 @@ const styles = StyleSheet.create({
   progressBox: {
     flexDirection: 'row', alignItems: 'center', gap: 10,
     backgroundColor: Colors.primary + '15', padding: 12, borderRadius: Radius.sm,
+  },
+  progressTrack: {
+    height: 4, backgroundColor: Colors.border,
+    borderRadius: 2, marginTop: 6, overflow: 'hidden',
+  },
+  progressFill: {
+    height: 4, backgroundColor: Colors.primary, borderRadius: 2,
   },
   progressText: { fontSize: FontSize.md, fontWeight: '600' },
   uploadBtn: {
