@@ -19,7 +19,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20iOS-lightgrey?style=flat-square"/>
+  <img src="https://img.shields.io/badge/Platform-Android-lightgrey?style=flat-square"/>
   <img src="https://img.shields.io/badge/Version-1.0.0-success?style=flat-square"/>
   <img src="https://img.shields.io/badge/License-Private-red?style=flat-square"/>
 </p>
