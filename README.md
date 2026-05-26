@@ -9,7 +9,7 @@
 </p>
 
 <p align="center">
-  <a href="https://expo.dev/accounts/ananddev7771/projects/vinyak-infratrack/builds/2605d00c-1fa5-4d7d-86ba-dd254d4823e3">
+  <a href="https://github.com/anand7771-dev/vinyak-infratrack/releases/latest">
     <img src="https://img.shields.io/badge/Download%20APK-Android-green?style=for-the-badge&logo=android" alt="Download APK"/>
   </a>
   <img src="https://img.shields.io/badge/React%20Native-0.81-blue?style=for-the-badge&logo=react" alt="React Native"/>
@@ -30,7 +30,7 @@
 
 > **Android APK** (direct install — no Play Store needed):
 
-🔗 **[Install on Android →](https://expo.dev/accounts/ananddev7771/projects/vinyak-infratrack/builds/2605d00c-1fa5-4d7d-86ba-dd254d4823e3)**
+🔗 **[Install on Android →](https://github.com/anand7771-dev/vinyak-infratrack/releases/latest)**
 
 Scan the QR code on the link above with your Android device to install instantly.
 
